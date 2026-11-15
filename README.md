@@ -12,7 +12,7 @@ at `plugins/vendor/default_pipelines`.
 Helio registers no pipeline and has no default: it knows the frame (its slots, draw phases
 and lighting-model points) and turns a preset into a graph asset. This plugin decides which
 pipelines ship and serves each as a read-only file in every project's
-`plugins/pulsar.default_pipelines/` folder:
+`plugins/pulsar.default_pipelines/default/` folder:
 
 | File | What |
 |---|---|

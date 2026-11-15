@@ -1,6 +1,6 @@
 //! Default Pipelines (`pulsar.default_pipelines`): the render pipelines the
-//! engine ships, as `.rendergraph` assets in the plugin's folder
-//! (`plugins/pulsar.default_pipelines/`).
+//! engine ships, as `.rendergraph` assets in the plugin's `default/` folder
+//! (`plugins/pulsar.default_pipelines/default/`).
 //!
 //! Helio registers no pipeline and has no default: it knows the frame (the
 //! slots, draw phases and lighting model its presets are made of) and turns a
@@ -133,11 +133,12 @@ fn file_name(stem: &str) -> String {
 /// The project-relative path (the pipeline id a level stores) of the file
 /// `stem`.
 pub fn asset_path(stem: &str) -> String {
-    format!(
-        "{}/{PLUGIN_ID}/{}",
+    let path = format!(
+        "{}/{PLUGIN_ID}/default/{}",
         engine_fs::virtual_fs::PLUGINS_FOLDER,
         file_name(stem)
-    )
+    );
+    engine_fs::virtual_fs::canonical_mount_path(&path)
 }
 
 /// The node registry the files are made from: the engine's (Helio's nodes and
@@ -155,7 +156,7 @@ pub fn files(registry: &NodeRegistry) -> BTreeMap<String, Vec<u8>> {
             asset.name = shipped.stem.clone();
             asset.description = shipped.description;
             (
-                file_name(&shipped.stem),
+                format!("default/{}", file_name(&shipped.stem)),
                 (asset.to_json() + "\n").into_bytes(),
             )
         })
@@ -245,7 +246,12 @@ fn open(folder: PluginFolder) -> Arc<dyn FolderSource> {
 fn migrate(id: &str) -> Option<String> {
     shipped(&pipelines::current_node_registry())
         .into_iter()
-        .find(|shipped| shipped.replaces.iter().any(|old| old == id))
+        .find(|shipped| {
+            let old_path = format!("plugins/{PLUGIN_ID}/{}", file_name(&shipped.stem));
+            shipped.replaces.iter().any(|old| old == id)
+                || id == old_path
+                || id == engine_fs::virtual_fs::canonical_mount_path(&old_path)
+        })
         .map(|shipped| asset_path(&shipped.stem))
 }
 
@@ -275,7 +281,15 @@ mod tests {
         assert_eq!(file_stem("HLFS"), "HLFS");
         assert_eq!(
             asset_path("Deferred"),
-            "plugins/pulsar.default_pipelines/Deferred.rendergraph"
+            "plugins/Default Pipelines/default/Deferred.rendergraph"
+        );
+    }
+
+    #[test]
+    fn old_root_paths_migrate_to_the_default_folder() {
+        assert_eq!(
+            migrate("plugins/pulsar.default_pipelines/Deferred.rendergraph"),
+            Some("plugins/Default Pipelines/default/Deferred.rendergraph".into())
         );
     }
 }

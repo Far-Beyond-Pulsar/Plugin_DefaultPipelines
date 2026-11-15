@@ -19,9 +19,9 @@ fn every_shipped_pipeline_is_a_file_that_validates() {
     assert_eq!(
         names,
         [
-            "Deferred.rendergraph",
-            "DeferredFxaa.rendergraph",
-            "Forward.rendergraph"
+            "default/Deferred.rendergraph",
+            "default/DeferredFxaa.rendergraph",
+            "default/Forward.rendergraph"
         ],
         "Helio's base registry has no lighting model pipelines"
     );
@@ -40,7 +40,7 @@ fn every_shipped_pipeline_is_a_file_that_validates() {
 #[test]
 fn the_deferred_file_is_the_deferred_preset_and_follows_the_projects_antialiasing() {
     let registry = registry();
-    let text = String::from_utf8(files(&registry)["Deferred.rendergraph"].clone()).unwrap();
+    let text = String::from_utf8(files(&registry)["default/Deferred.rendergraph"].clone()).unwrap();
     let asset = GraphAsset::from_json(&text).unwrap();
     assert_eq!(
         asset,
@@ -77,16 +77,16 @@ fn the_old_built_in_ids_name_the_files_that_replace_them() {
             .find(|shipped| shipped.replaces.iter().any(|id| id == old))
             .map(|shipped| asset_path(&shipped.stem))
     };
-    let deferred = Some("plugins/pulsar.default_pipelines/Deferred.rendergraph".to_string());
+    let deferred = Some("plugins/Default Pipelines/default/Deferred.rendergraph".to_string());
     assert_eq!(replaced("helio.deferred"), deferred);
     assert_eq!(replaced("helio.deferred_graph"), deferred);
     assert_eq!(
         replaced("helio.fxaa").as_deref(),
-        Some("plugins/pulsar.default_pipelines/DeferredFxaa.rendergraph")
+        Some("plugins/Default Pipelines/default/DeferredFxaa.rendergraph")
     );
     assert_eq!(
         replaced("helio.forward_only").as_deref(),
-        Some("plugins/pulsar.default_pipelines/Forward.rendergraph")
+        Some("plugins/Default Pipelines/default/Forward.rendergraph")
     );
     assert_eq!(replaced("graphs/mine.rendergraph"), None);
 }
