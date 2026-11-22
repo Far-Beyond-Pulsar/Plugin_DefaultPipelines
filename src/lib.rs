@@ -257,6 +257,13 @@ fn migrate(id: &str) -> Option<String> {
 
 /// Everything the plugin registers.
 pub fn build(p: &mut pulsar_plugins::PluginBuilder) {
+    // The icon the editor shows beside this plugin (Extensions window).
+    #[cfg(feature = "editor")]
+    p.add(pulsar_plugins::PluginIcon {
+        origin: p.origin(),
+        format: pulsar_plugins::IconFormat::Png,
+        bytes: include_bytes!("../icon.png"),
+    });
     // The folder of shipped pipelines. A packaged game serves the packager's
     // snapshot of it (made for the project's plugins).
     p.add(engine_fs::FileProvider {
