@@ -1,6 +1,6 @@
 [package]
 name = "default_pipelines_plugin"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 publish = false
 description = "Default Pipelines (`pulsar.default_pipelines`): the render pipelines the engine ships, as .rendergraph assets in the plugin's folder, made from Helio's presets for the enabled plugins"
