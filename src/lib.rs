@@ -271,6 +271,13 @@ pub fn build(p: &mut pulsar_plugins::PluginBuilder) {
         open,
         in_game: engine_fs::InGame::Snapshot,
     });
+    // What a game with no level runs (a menu before any level): the deferred
+    // file, the pipeline most levels run, so a level load rarely rebuilds.
+    // Every shipped file has the widget nodes.
+    p.add(pipelines::FallbackPipeline {
+        origin: p.origin(),
+        id: || asset_path("Deferred"),
+    });
     // Levels that name an old built-in id run the file that replaced it.
     p.add(PipelineIdMigration {
         origin: p.origin(),
